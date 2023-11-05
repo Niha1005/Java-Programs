@@ -1,0 +1,93 @@
+package thread;
+
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+class SharedBuffer {
+    private final int capacity;
+    private final Queue<Integer> buffer = new LinkedList<>();
+    private final Lock lock = new ReentrantLock();
+    private final Condition notFull = lock.newCondition();
+    private final Condition notEmpty = lock.newCondition();
+
+    public SharedBuffer(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public void produce(int item) throws InterruptedException {
+        lock.lock();
+        try {
+            while (buffer.size() == capacity) {
+                
+                notFull.await();
+            }
+            buffer.offer(item);
+            System.out.println("Produced: " + item);
+            
+            notEmpty.signalAll();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public int consume() throws InterruptedException {
+        lock.lock();
+        try {
+            while (buffer.isEmpty()) {
+                notEmpty.await();
+            }
+            int item = buffer.poll();
+            System.out.println("Consumed: " + item);
+            notFull.signalAll();
+            return item;
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+
+class Producer extends Thread {
+    private final SharedBuffer buffer;
+    private final int maxItems;
+
+    public Producer(SharedBuffer buffer, int maxItems) {
+        this.buffer = buffer;
+        this.maxItems = maxItems;
+    }
+
+    public void run() {
+        for (int i = 1; i <= maxItems; i++) {
+            try {
+                buffer.produce(i);
+                Thread.sleep(1000); 
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+class Consumer extends Thread {
+    private final SharedBuffer buffer;
+
+    public Consumer(SharedBuffer buffer) {
+        this.buffer = buffer;
+    }
+
+    public void run() {
+        while (true) {
+            try {
+                int item = buffer.consume();
+               
+                Thread.sleep(1500); 
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+

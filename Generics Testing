@@ -1,0 +1,81 @@
+import java.util.Collections;
+
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
+
+class Testing<T extends Number> {
+    private List<T> values = new ArrayList<>();
+
+    public void addValue(T value) {
+        values.add(value);
+    }
+
+    public List<T> getValues() {
+        return values;
+    }
+    
+    private void sort() {
+    	// TODO Auto-generated method stub
+    	
+    }
+    
+    public static <T extends Comparable<T>> void sort (List<T> list) {
+    	Collections.sort(list);
+    }
+    
+    public double sum() {
+        double total = 0;
+        for (T value : values) {
+            total += value.doubleValue();
+        }
+        return total;
+    }
+
+
+public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		 Scanner scanner = new Scanner(System.in);
+	     Testing<Number> values = new Testing<>();
+	     
+	     int choice;
+	        do {
+	            System.out.println("1. Add Integer");
+	            System.out.println("2. Add Double");
+	            System.out.println("3. Calculate Sum");
+	            System.out.println("4. Sort");
+	            System.out.println("5. Exit");
+	            System.out.print("Enter your choice: ");
+	            choice = scanner.nextInt();
+
+	            switch (choice) {
+	                case 1:
+	                    System.out.print("Enter an Integer: ");
+	                    int intValue = scanner.nextInt();
+	                    values.addValue(intValue);
+	                    break;
+	                case 2:
+	                    System.out.print("Enter a Double: ");
+	                    double doubleValue = scanner.nextDouble();
+	                    values.addValue(doubleValue);
+	                    break;
+	                case 3:
+	                    System.out.println("Sum of values: " + values.sum());
+	                    break;
+	                case 4:
+					    values.sort();
+	                    System.out.println("Sorted values: " + values.getValues());
+	                    break;
+	                case 5:
+	                    System.out.println("Exiting program.");
+	                    break;
+	                default:
+	                    System.out.println("Invalid choice. Please try again.");
+	                    break;
+	            }
+	        } while (choice != 5);
+
+	        scanner.close();
+
+	}
+}
